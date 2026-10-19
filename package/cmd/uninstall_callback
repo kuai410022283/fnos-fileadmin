@@ -1,0 +1,29 @@
+#!/bin/bash
+set -u
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+APP_ROOT="$(dirname "$SCRIPT_DIR")"
+TRIM_PKGVAR="${TRIM_PKGVAR:-${APP_ROOT}/var}"
+
+# Stop first. The platform stops the app during uninstall, but this keeps
+# manual removal safe as well.
+if [ -x "${SCRIPT_DIR}/main" ]; then
+  "${SCRIPT_DIR}/main" stop >/dev/null 2>&1 || true
+fi
+
+ACTION="${wizard_data_action:-keep}"
+if [ "${ACTION}" != "delete" ]; then
+  echo "FileAdmin 数据已保留：${TRIM_PKGVAR}"
+  exit 0
+fi
+
+case "${TRIM_PKGVAR}" in
+  ""|"/"|"/var"|"/var/apps"|"/vol")
+    echo "拒绝删除不安全的路径：${TRIM_PKGVAR}" >&2
+    exit 1
+    ;;
+esac
+
+echo "正在删除 FileAdmin 数据：${TRIM_PKGVAR}"
+rm -rf -- "${TRIM_PKGVAR}"
+exit 0

@@ -1,0 +1,145 @@
+#!/bin/bash
+set -u
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+APP_ROOT="$(dirname "$SCRIPT_DIR")"
+TRIM_APPDEST="${TRIM_APPDEST:-${APP_ROOT}/app}"
+TRIM_PKGVAR="${TRIM_PKGVAR:-${APP_ROOT}/var}"
+TRIM_PKGTMP="${TRIM_PKGTMP:-${APP_ROOT}/tmp}"
+
+PORT="${TRIM_SERVICE_PORT:-18080}"
+CONFIG="${TRIM_PKGVAR}/config.yaml"
+PID_FILE="${TRIM_PKGVAR}/fileadmin.pid"
+LOG_FILE="${TRIM_PKGVAR}/fileadmin.log"
+
+case "$(uname -m)" in
+  x86_64|amd64) BINARY_ARCH="x86_64" ;;
+  aarch64|arm64) BINARY_ARCH="aarch64" ;;
+  *) BINARY_ARCH="$(uname -m)" ;;
+esac
+BINARY="${TRIM_APPDEST}/server/fileadmin_${BINARY_ARCH}"
+
+log_msg() {
+  mkdir -p "$(dirname "${LOG_FILE}")" 2>/dev/null || true
+  echo "$(date '+%Y-%m-%d %H:%M:%S') - $*" >>"${LOG_FILE}"
+}
+
+fail() {
+  log_msg "FAIL: $*"
+  if [ -n "${TRIM_TEMP_LOGFILE:-}" ]; then
+    echo "$*" >"${TRIM_TEMP_LOGFILE}"
+  fi
+  return 1
+}
+
+running() {
+  [ -f "${PID_FILE}" ] || return 1
+  local pid
+  pid="$(head -n 1 "${PID_FILE}" 2>/dev/null | tr -d '[:space:]')"
+  [ -n "${pid}" ] || return 1
+  kill -0 "${pid}" 2>/dev/null
+}
+
+healthy() {
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsS --max-time 2 "http://127.0.0.1:${PORT}/healthz" >/dev/null 2>&1
+    return $?
+  fi
+  running
+}
+
+start_process() {
+  if running; then
+    log_msg "already running (PID $(head -n 1 "${PID_FILE}"))"
+    return 0
+  fi
+  if [ ! -f "${CONFIG}" ]; then
+    fail "缺少配置文件 ${CONFIG}，请重新安装应用"
+    return 1
+  fi
+  if [ ! -f "${BINARY}" ]; then
+    fail "缺少可执行文件 ${BINARY}"
+    return 1
+  fi
+
+  mkdir -p "${TRIM_PKGVAR}/data" "${TRIM_PKGVAR}/tmp" 2>/dev/null || true
+  chmod +x "${BINARY}" 2>/dev/null || true
+  log_msg "starting FileAdmin ${TRIM_APPVER:-unknown} on port ${PORT}"
+
+  cd "${TRIM_PKGVAR}" || return 1
+  "${BINARY}" serve -config "${CONFIG}" >>"${LOG_FILE}" 2>&1 &
+  local pid=$!
+  printf '%s' "${pid}" >"${PID_FILE}"
+
+  local i
+  for i in 1 2 3 4 5 6 7 8 9 10; do
+    if healthy; then
+      # The initial password is only needed once. Do not keep it in plaintext.
+      if grep -q '^[[:space:]]*bootstrap_password:[[:space:]]*"."' "${CONFIG}" 2>/dev/null; then
+        sed -i 's|^[[:space:]]*bootstrap_password:.*|  bootstrap_password: ""|' "${CONFIG}" 2>/dev/null || true
+      fi
+      log_msg "started (PID ${pid})"
+      return 0
+    fi
+    if ! kill -0 "${pid}" 2>/dev/null; then
+      break
+    fi
+    sleep 1
+  done
+
+  kill "${pid}" 2>/dev/null || true
+  rm -f "${PID_FILE}"
+  fail "FileAdmin 启动失败，请查看日志 ${LOG_FILE}"
+  return 1
+}
+
+stop_process() {
+  if [ ! -f "${PID_FILE}" ]; then
+    log_msg "not running (no PID file)"
+    return 0
+  fi
+  local pid
+  pid="$(head -n 1 "${PID_FILE}" | tr -d '[:space:]')"
+  if [ -n "${pid}" ] && kill -0 "${pid}" 2>/dev/null; then
+    log_msg "stopping PID ${pid}"
+    kill "${pid}" 2>/dev/null || true
+    local i
+    for i in 1 2 3 4 5 6 7 8 9 10; do
+      kill -0 "${pid}" 2>/dev/null || break
+      sleep 1
+    done
+    if kill -0 "${pid}" 2>/dev/null; then
+      log_msg "SIGTERM timeout; killing PID ${pid}"
+      kill -9 "${pid}" 2>/dev/null || true
+    fi
+  fi
+  rm -f "${PID_FILE}"
+  log_msg "stopped"
+  return 0
+}
+
+case "${1:-}" in
+  start)
+    start_process
+    ;;
+  stop)
+    stop_process
+    ;;
+  restart)
+    stop_process
+    sleep 1
+    start_process
+    ;;
+  status)
+    if running; then
+      echo "Running (PID $(head -n 1 "${PID_FILE}"))"
+      exit 0
+    fi
+    echo "Not running"
+    exit 3
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}" >&2
+    exit 1
+    ;;
+esac

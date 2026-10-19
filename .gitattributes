@@ -1,0 +1,9 @@
+* text=auto
+*.sh text eol=lf
+package/cmd/* text eol=lf
+package/manifest text eol=lf
+package/config/* text eol=lf
+package/wizard/* text eol=lf
+package/i18n/* text eol=lf
+package/app/ui/config text eol=lf
+package/app/server/config.yaml.template text eol=lf

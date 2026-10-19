@@ -1,0 +1,11 @@
+[
+  {
+    "stepTitle": "${config.stepTitle}",
+    "items": [
+      {
+        "type": "tips",
+        "helpText": "${config.helpText}"
+      }
+    ]
+  }
+]

@@ -1,0 +1,7 @@
+*.fpk
+*.fpk.sha256
+fnpack
+fnpack.exe
+package/app/server/fileadmin_x86_64
+package/app/server/fileadmin_aarch64
+package/app/server/.tmp

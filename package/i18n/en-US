@@ -1,0 +1,25 @@
+[common]
+displayName="FileAdmin"
+desc="""<b>FileAdmin</b> is a self-hosted, lightweight file manager. Register existing NAS directories as storage roots and browse, preview, upload, download, share and manage files from a browser.<br/><br/><b>Features</b><br/>📁 Directory tree, search, sorting and pagination<br/>👁 Image, audio/video, PDF, text and Markdown previews<br/>🔐 Users, groups and directory-level ACL<br/>⬆️ Chunked uploads with resume<br/>🗑 Trash, restore and permanent delete<br/>🔗 File/folder sharing with expiry, password and download limits<br/>💾 Per-user spaces and quotas<br/><br/>The app runs as a dedicated package user and uses its own authentication and authorization. No unauthenticated API is exposed."""
+
+[entry]
+title="FileAdmin"
+
+[install]
+stepTitle="FileAdmin administrator"
+helpText="After installation, sign in at http://NAS-IP:18080/login. The administrator username is admin. Set a password of at least 8 characters, then add the directories you want to manage under Storage Roots."
+passwordLabel="Administrator password"
+passwordRequiredMsg="Administrator password is required"
+passwordLengthMsg="Password must be between 8 and 128 characters"
+
+[uninstall]
+stepTitle="Uninstall FileAdmin"
+helpText="""<strong>FileAdmin is about to be uninstalled.</strong><br><br>Choose whether to keep application data. This includes the SQLite database, configuration, secret, upload temp files and trash. External storage roots are never deleted."""
+dataOptionLabel="Data handling"
+keepDataLabel="Keep data (recommended)"
+deleteDataLabel="Delete FileAdmin application data"
+selectionRequiredMsg="Choose how to handle data"
+
+[config]
+stepTitle="FileAdmin settings"
+helpText="Configure storage roots, users, permissions and quotas from the FileAdmin admin pages after signing in."

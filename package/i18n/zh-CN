@@ -1,0 +1,25 @@
+[common]
+displayName="FileAdmin"
+desc="""<b>FileAdmin</b> 是一个自托管的轻量文件管理系统。把 NAS 上已有目录登记为存储根，即可通过浏览器浏览、预览、上传、下载、分享和管理文件。<br/><br/><b>主要功能</b><br/>📁 目录树、搜索、排序、分页<br/>👁 图片/音视频/PDF/文本/Markdown 预览<br/>🔐 用户、用户组与目录级 ACL<br/>⬆️ 分片上传与断点续传<br/>🗑 回收站、恢复与彻底删除<br/>🔗 文件/目录分享，支持有效期、密码和下载次数<br/>💾 用户独立空间与配额<br/><br/>应用以专用 package 用户运行，使用 FileAdmin 自己的登录与权限体系，不监听免鉴权接口。"""
+
+[entry]
+title="FileAdmin"
+
+[install]
+stepTitle="FileAdmin 管理员"
+helpText="安装后通过 http://NAS地址:18080/login 登录。管理员用户名为 admin，请设置一个至少 8 位的密码。首次登录后请在「存储根」中添加需要管理的目录。"
+passwordLabel="管理员密码"
+passwordRequiredMsg="管理员密码不能为空"
+passwordLengthMsg="密码长度必须在 8-128 位之间"
+
+[uninstall]
+stepTitle="卸载 FileAdmin"
+helpText="""<strong>即将卸载 FileAdmin</strong><br><br>请选择是否保留应用数据。数据包括 SQLite 数据库、配置、密钥、上传临时文件和回收站。用户后来添加的外部存储目录不会被删除。"""
+dataOptionLabel="数据处理"
+keepDataLabel="保留数据（推荐）"
+deleteDataLabel="删除 FileAdmin 应用数据"
+selectionRequiredMsg="请选择数据处理方式"
+
+[config]
+stepTitle="FileAdmin 设置"
+helpText="FileAdmin 的运行设置请在应用内完成。存储根、用户、权限与配额请登录后进入管理页面配置。"

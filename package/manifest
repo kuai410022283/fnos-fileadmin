@@ -1,0 +1,17 @@
+appname               = fileadmin
+version               = 1.0.0
+display_name          = "${common.displayName}"
+desc                  = "${common.desc}"
+platform              = all
+source                = thirdparty
+maintainer            = laok
+maintainer_url        = https://github.com/kuai410022283
+distributor           = laok
+distributor_url       = https://github.com/kuai410022283/fnos-fileadmin
+desktop_uidir         = ui
+desktop_applaunchname = fileadmin.main
+reloadui              = yes
+ctl_stop              = true
+service_port          = 18080
+checkport             = true
+disable_authorization_path = false

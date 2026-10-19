@@ -1,0 +1,26 @@
+server:
+  addr: "0.0.0.0:__PORT__"
+  production: false
+  read_header_timeout: 10s
+  idle_timeout: 120s
+  shutdown_timeout: 15s
+
+database:
+  dsn: "__DB_PATH__"
+  auto_migrate: true
+
+storage:
+  data_dir: "__DATA_DIR__"
+  temp_dir: "__TEMP_DIR__"
+
+auth:
+  jwt_secret: "__SECRET__"
+  access_ttl: 15m
+  refresh_ttl: 168h
+  remember_ttl: 720h
+  cookie_secure: false
+  bootstrap_password: "__ADMIN_PASSWORD__"
+
+log:
+  level: info
+  format: text

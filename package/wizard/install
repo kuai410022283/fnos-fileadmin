@@ -1,0 +1,28 @@
+[
+  {
+    "stepTitle": "${install.stepTitle}",
+    "items": [
+      {
+        "type": "tips",
+        "helpText": "${install.helpText}"
+      },
+      {
+        "type": "password",
+        "field": "wizard_admin_password",
+        "label": "${install.passwordLabel}",
+        "initValue": "",
+        "rules": [
+          {
+            "required": true,
+            "message": "${install.passwordRequiredMsg}"
+          },
+          {
+            "min": 8,
+            "max": 128,
+            "message": "${install.passwordLengthMsg}"
+          }
+        ]
+      }
+    ]
+  }
+]

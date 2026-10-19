@@ -1,0 +1,76 @@
+#!/bin/bash
+set -u
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+APP_ROOT="$(dirname "$SCRIPT_DIR")"
+TRIM_APPDEST="${TRIM_APPDEST:-${APP_ROOT}/app}"
+TRIM_PKGVAR="${TRIM_PKGVAR:-${APP_ROOT}/var}"
+
+CONFIG="${TRIM_PKGVAR}/config.yaml"
+PORT="${TRIM_SERVICE_PORT:-18080}"
+PASSWORD="${wizard_admin_password:-}"
+
+fail() {
+  echo "FileAdmin: $1" >&2
+  if [ -n "${TRIM_TEMP_LOGFILE:-}" ]; then
+    echo "$1" >"${TRIM_TEMP_LOGFILE}"
+  fi
+  exit 1
+}
+
+case "${PORT}" in
+  ''|*[!0-9]*) fail "服务端口必须是数字" ;;
+esac
+if [ "${PORT}" -lt 1 ] || [ "${PORT}" -gt 65535 ]; then
+  fail "服务端口必须在 1-65535 之间"
+fi
+if [ -z "${PASSWORD}" ]; then
+  fail "请设置 FileAdmin 管理员密码"
+fi
+if [ "${#PASSWORD}" -lt 8 ] || [ "${#PASSWORD}" -gt 128 ]; then
+  fail "管理员密码长度必须在 8-128 位之间"
+fi
+
+umask 077
+mkdir -p "${TRIM_PKGVAR}/data" "${TRIM_PKGVAR}/tmp" || fail "无法创建应用数据目录"
+chmod 700 "${TRIM_PKGVAR}" "${TRIM_PKGVAR}/data" "${TRIM_PKGVAR}/tmp" 2>/dev/null || true
+
+if [ -f "${CONFIG}" ]; then
+  echo "FileAdmin 配置已存在，保留现有配置。"
+  exit 0
+fi
+
+TEMPLATE="${TRIM_APPDEST}/server/config.yaml.template"
+[ -f "${TEMPLATE}" ] || fail "缺少配置模板: ${TEMPLATE}"
+
+if command -v openssl >/dev/null 2>&1; then
+  SECRET="$(openssl rand -hex 32)"
+else
+  SECRET="$(od -An -N32 -tx1 /dev/urandom 2>/dev/null | tr -d ' \n')"
+fi
+[ -n "${SECRET}" ] || fail "无法生成 JWT 密钥"
+
+yaml_escape() {
+  printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
+}
+sed_escape() {
+  printf '%s' "$1" | sed -e 's/[\\&|]/\\&/g'
+}
+
+PASSWORD_YAML="$(sed_escape "$(yaml_escape "${PASSWORD}")")"
+SECRET_YAML="$(sed_escape "${SECRET}")"
+
+sed \
+  -e "s|__PORT__|${PORT}|g" \
+  -e "s|__DB_PATH__|${TRIM_PKGVAR}/data/fileadmin.db|g" \
+  -e "s|__DATA_DIR__|${TRIM_PKGVAR}/data|g" \
+  -e "s|__TEMP_DIR__|${TRIM_PKGVAR}/tmp|g" \
+  -e "s|__SECRET__|${SECRET_YAML}|g" \
+  -e "s|__ADMIN_PASSWORD__|${PASSWORD_YAML}|g" \
+  "${TEMPLATE}" >"${CONFIG}" || fail "生成配置文件失败"
+
+chmod 600 "${CONFIG}" || fail "无法设置配置文件权限"
+chmod +x "${TRIM_APPDEST}"/server/fileadmin_* 2>/dev/null || true
+
+echo "FileAdmin 安装完成：端口 ${PORT}，数据目录 ${TRIM_PKGVAR}/data"
+exit 0

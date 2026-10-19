@@ -1,0 +1,33 @@
+[
+  {
+    "stepTitle": "${uninstall.stepTitle}",
+    "items": [
+      {
+        "type": "tips",
+        "helpText": "${uninstall.helpText}"
+      },
+      {
+        "type": "radio",
+        "field": "wizard_data_action",
+        "label": "${uninstall.dataOptionLabel}",
+        "initValue": "keep",
+        "options": [
+          {
+            "label": "${uninstall.keepDataLabel}",
+            "value": "keep"
+          },
+          {
+            "label": "${uninstall.deleteDataLabel}",
+            "value": "delete"
+          }
+        ],
+        "rules": [
+          {
+            "required": true,
+            "message": "${uninstall.selectionRequiredMsg}"
+          }
+        ]
+      }
+    ]
+  }
+]
