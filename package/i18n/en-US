@@ -6,11 +6,15 @@ desc="""<b>FileAdmin</b> is a self-hosted, lightweight file manager. Register ex
 title="FileAdmin"
 
 [install]
-stepTitle="FileAdmin administrator"
-helpText="After installation, sign in at http://NAS-IP:18080/login. The administrator username is admin. Set a password of at least 10 characters, then add the directories you want to manage under Storage Roots."
-passwordLabel="Administrator password"
+stepTitle="FileAdmin setup"
+helpText="Set the FileAdmin service port and initial administrator password. After installation, sign in at http://NAS-IP:PORT/login with username admin. The default password is admin123; change it after the first sign-in. Application data is managed by fnOS."
+portLabel="Service port"
+portRequiredMsg="Port is required"
+portPatternMsg="Port must contain digits only"
+portRangeMsg="Port must be between 1 and 65535"
+passwordLabel="Initial administrator password"
 passwordRequiredMsg="Administrator password is required"
-passwordLengthMsg="Password must be between 10 and 128 characters"
+passwordLengthMsg="Password must be between 8 and 128 characters"
 
 [uninstall]
 stepTitle="Uninstall FileAdmin"

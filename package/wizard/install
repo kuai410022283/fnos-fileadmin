@@ -7,17 +7,38 @@
         "helpText": "${install.helpText}"
       },
       {
+        "type": "text",
+        "field": "wizard_port",
+        "label": "${install.portLabel}",
+        "initValue": "18080",
+        "rules": [
+          {
+            "required": true,
+            "message": "${install.portRequiredMsg}"
+          },
+          {
+            "pattern": "^[0-9]+$",
+            "message": "${install.portPatternMsg}"
+          },
+          {
+            "min": 1,
+            "max": 65535,
+            "message": "${install.portRangeMsg}"
+          }
+        ]
+      },
+      {
         "type": "password",
         "field": "wizard_admin_password",
         "label": "${install.passwordLabel}",
-        "initValue": "",
+        "initValue": "admin123",
         "rules": [
           {
             "required": true,
             "message": "${install.passwordRequiredMsg}"
           },
           {
-            "min": 10,
+            "min": 8,
             "max": 128,
             "message": "${install.passwordLengthMsg}"
           }

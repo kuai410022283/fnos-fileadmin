@@ -8,6 +8,12 @@ TRIM_PKGVAR="${TRIM_PKGVAR:-${APP_ROOT}/var}"
 TRIM_PKGTMP="${TRIM_PKGTMP:-${APP_ROOT}/tmp}"
 
 PORT="${TRIM_SERVICE_PORT:-18080}"
+if [ -f "${TRIM_PKGVAR}/server_port" ]; then
+  SAVED_PORT="$(head -n 1 "${TRIM_PKGVAR}/server_port" 2>/dev/null | tr -d '[:space:]')"
+  if [ -n "${SAVED_PORT}" ]; then
+    PORT="${SAVED_PORT}"
+  fi
+fi
 CONFIG="${TRIM_PKGVAR}/config.yaml"
 PID_FILE="${TRIM_PKGVAR}/fileadmin.pid"
 LOG_FILE="${TRIM_PKGVAR}/fileadmin.log"

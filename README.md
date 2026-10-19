@@ -10,7 +10,7 @@
 - FileAdmin 二进制已内嵌 Web 前端，不依赖 Node、Nginx 或独立数据库
 - 以专用 `package` 用户运行，不使用 root
 - 保留 FileAdmin 自身的登录、用户、ACL、分享和配额体系
-- 安装向导设置管理员密码，首次启动后从配置中清除明文密码
+- 安装向导设置服务端口和管理员初始密码
 - 数据、数据库、密钥、上传临时文件和回收站统一放在应用数据目录
 - 卸载时可选保留或删除应用数据，外部存储根不会被删除
 
@@ -20,10 +20,10 @@
 |---|---|
 | appname | `fileadmin` |
 | 显示名称 | FileAdmin |
-| 版本 | `1.0.1`（`x.y.z` 三段式） |
+| 版本 | `1.0.2`（`x.y.z` 三段式） |
 | 架构 | `all`：`x86_64` + `aarch64` |
-| 服务端口 | `18080` |
-| 入口 | `http://NAS-IP:18080/login` |
+| 服务端口 | 安装时配置，默认 `18080` |
+| 入口 | `http://NAS-IP:端口/login` |
 | 运行用户 | `fileadmin` package 用户 |
 | 数据目录 | `/var/apps/fileadmin/var`（由 fnOS 管理） |
 | 日志 | `$TRIM_PKGVAR/fileadmin.log` |
@@ -33,7 +33,7 @@
 从 [Releases](https://github.com/kuai410022283/fnos-fileadmin/releases) 下载最新：
 
 ```text
-fileadmin_all_v1.0.1.fpk
+fileadmin_all_v1.0.2.fpk
 ```
 
 在飞牛 NAS：
@@ -41,7 +41,7 @@ fileadmin_all_v1.0.1.fpk
 1. 打开 **应用中心**
 2. 选择 **手动安装 / 开发导入**
 3. 选择 `.fpk`
-4. 在安装向导中设置 FileAdmin 管理员密码（至少 10 位）
+4. 在安装向导中设置服务端口和 FileAdmin 管理员初始密码（默认 `admin123`，建议修改）
 5. 安装完成后从桌面打开 FileAdmin
 6. 登录用户名为 `admin`，密码为安装时设置的值
 
@@ -54,6 +54,24 @@ fileadmin_all_v1.0.1.fpk
 
 > FileAdmin 以 package 用户运行，无法天然访问所有 NAS 目录。添加存储根前，请先在飞牛应用权限中授权对应目录。外部目录只被读写，不会被卸载删除。
 
+## 安装向导与目录选择
+
+当前安装向导支持：
+
+- **服务端口**：`wizard_port`，默认 `18080`
+- **管理员初始密码**：`wizard_admin_password`，默认 `admin123`
+- 数据处理方式：卸载时保留或删除应用数据
+
+安装向导**不支持原生的目录选择器**。fnOS 的 `wizard` 字段类型只有 `text`、`password`、`radio`、`checkbox`、`select`、`switch`、`tips`，没有文件选择器类型。
+
+因此：
+
+- 应用自身的数据目录由 fnOS 通过 `TRIM_PKGVAR` / `TRIM_APPDEST` 管理，不需要用户选择。
+- FileAdmin 管理的「存储根」在安装完成后，由管理员进入 FileAdmin 的「存储根」页面添加。
+- 飞牛开放 API 的 `pickUserFile` / `pickSharedFile` 是**应用页面内**的 JS SDK 能力，需要 `micro_app=true`、`api-scope`、统一网关和用户点击触发；它不能在原生安装向导中调用。
+
+如果后续需要“安装完首次进入应用时弹出目录选择器”，需要把 FileAdmin 前端接入飞牛微应用 SDK 和统一网关，这是下一步的集成工作。
+
 ## 自动构建
 
 工作流：[`.github/workflows/build-fpk.yml`](.github/workflows/build-fpk.yml)
@@ -62,21 +80,21 @@ fileadmin_all_v1.0.1.fpk
 
 在 GitHub Actions 中运行 **Build fnOS FPK**，填写：
 
-- `fileadmin_version`：`1.0.1`
+- `fileadmin_version`：`1.0.2`
 - `fileadmin_ref`：`main`，或 FileAdmin 的 tag/commit
 
 生成：
 
 ```text
-fileadmin_all_v1.0.1.fpk
-fileadmin_all_v1.0.1.fpk.sha256
+fileadmin_all_v1.0.2.fpk
+fileadmin_all_v1.0.2.fpk.sha256
 ```
 
 ### 打 tag 触发
 
 ```bash
-git tag v1.0.1
-git push origin v1.0.1
+git tag v1.0.2
+git push origin v1.0.2
 ```
 
 工作流会构建 `.fpk` 并创建 GitHub Release。
@@ -116,7 +134,7 @@ export FILEADMIN_SRC=/path/to/fileAdmin
 1. 读取 `package/manifest` 中的版本号
 2. 交叉编译 `linux/amd64` 和 `linux/arm64`
 3. 下载对应平台的 fnpack
-4. 生成 `fileadmin_all_v1.0.1.fpk`
+4. 生成 `fileadmin_all_v1.0.2.fpk`
 5. 生成 `.sha256`
 
 ## 手动打包（可选）
@@ -126,12 +144,12 @@ export FILEADMIN_SRC=/path/to/fileAdmin
 ```bash
 # 在 FileAdmin 源码目录
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-  go build -trimpath -ldflags "-s -w -X main.version=v1.0.1" \
+  go build -trimpath -ldflags "-s -w -X main.version=v1.0.2" \
   -o /path/to/fnos-fileadmin/package/app/server/fileadmin_x86_64 \
   ./cmd/fileadmin
 
 CGO_ENABLED=0 GOOS=linux GOARCH=arm64 \
-  go build -trimpath -ldflags "-s -w -X main.version=v1.0.1" \
+  go build -trimpath -ldflags "-s -w -X main.version=v1.0.2" \
   -o /path/to/fnos-fileadmin/package/app/server/fileadmin_aarch64 \
   ./cmd/fileadmin
 ```
@@ -153,7 +171,7 @@ chmod +x fnpack
 生成：
 
 ```text
-fileadmin_all_v1.0.1.fpk
+fileadmin_all_v1.0.2.fpk
 ```
 
 ## 目录结构
@@ -203,7 +221,7 @@ fileadmin_all_v1.0.1.fpk
 | `platform=x86/arm/all` | `platform=all`，实际包含 x86_64 与 aarch64 二进制 |
 | 文件读写路径安全 | FileAdmin 服务端规范化路径、拒绝目录穿越、软链逃逸防护 |
 | 付费声明 | 本应用免费，无付费功能 |
-| 版本号三段式 | manifest 中为 `1.0.1`，工作流强制校验 `x.y.z` 或 `x.y.z-m` |
+| 版本号三段式 | manifest 中为 `1.0.2`，工作流强制校验 `x.y.z` 或 `x.y.z-m` |
 | 应用名称不得以飞牛开头 | 名称为 `FileAdmin`，appname 为 `fileadmin` |
 
 ## 说明与边界

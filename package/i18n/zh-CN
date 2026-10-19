@@ -6,11 +6,15 @@ desc="""<b>FileAdmin</b> 是一个自托管的轻量文件管理系统。把 NAS
 title="FileAdmin"
 
 [install]
-stepTitle="FileAdmin 管理员"
-helpText="安装后通过 http://NAS地址:18080/login 登录。管理员用户名为 admin，请设置一个至少 10 位的密码。首次登录后请在「存储根」中添加需要管理的目录。"
-passwordLabel="管理员密码"
+stepTitle="FileAdmin 安装配置"
+helpText="设置 FileAdmin 的访问端口和初始管理员密码。安装后通过 http://NAS地址:端口/login 登录，管理员用户名为 admin。默认密码为 admin123，首次登录后请立即修改。数据目录由飞牛统一管理。"
+portLabel="服务端口"
+portRequiredMsg="端口不能为空"
+portPatternMsg="端口必须是数字"
+portRangeMsg="端口必须在 1-65535 之间"
+passwordLabel="管理员初始密码"
 passwordRequiredMsg="管理员密码不能为空"
-passwordLengthMsg="密码长度必须在 10-128 位之间"
+passwordLengthMsg="密码长度必须在 8-128 位之间"
 
 [uninstall]
 stepTitle="卸载 FileAdmin"

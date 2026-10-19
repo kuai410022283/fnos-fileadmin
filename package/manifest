@@ -1,5 +1,5 @@
 appname               = fileadmin
-version               = 1.0.1
+version               = 1.0.2
 display_name          = "${common.displayName}"
 desc                  = "${common.desc}"
 platform              = all
@@ -12,6 +12,5 @@ desktop_uidir         = ui
 desktop_applaunchname = fileadmin.main
 reloadui              = yes
 ctl_stop              = true
-service_port          = 18080
-checkport             = true
+checkport             = false
 disable_authorization_path = false
