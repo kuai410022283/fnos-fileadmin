@@ -20,7 +20,7 @@
 |---|---|
 | appname | `fileadmin` |
 | 显示名称 | FileAdmin |
-| 版本 | `1.0.2`（`x.y.z` 三段式） |
+| 版本 | `1.0.3`（`x.y.z` 三段式） |
 | 架构 | `all`：`x86_64` + `aarch64` |
 | 服务端口 | 安装时配置，默认 `18080` |
 | 入口 | `http://NAS-IP:端口/login` |
@@ -33,7 +33,7 @@
 从 [Releases](https://github.com/kuai410022283/fnos-fileadmin/releases) 下载最新：
 
 ```text
-fileadmin_all_v1.0.2.fpk
+fileadmin_all_v1.0.3.fpk
 ```
 
 在飞牛 NAS：
@@ -72,6 +72,55 @@ fileadmin_all_v1.0.2.fpk
 
 如果后续需要“安装完首次进入应用时弹出目录选择器”，需要把 FileAdmin 前端接入飞牛微应用 SDK 和统一网关，这是下一步的集成工作。
 
+## iframe 与 CSP
+
+飞牛桌面通过 iframe 打开 FileAdmin。FileAdmin 默认只允许同源嵌入：
+
+```text
+frame-ancestors 'self'
+```
+
+fnOS 包在 `package/app/server/config.yaml.template` 中使用：
+
+```yaml
+server:
+  frame_ancestors:
+    - "'self'"
+    - "*"
+```
+
+此时 FileAdmin 不再发送 `X-Frame-Options`，飞牛桌面可以正常嵌入。
+
+如果升级后仍然看到：
+
+```text
+Framing ... violates the following Content Security Policy directive:
+"frame-ancestors 'none'"
+```
+
+说明旧的 `config.yaml` 没有被升级回调更新。可以手动在：
+
+```text
+/var/apps/fileadmin/var/config.yaml
+```
+
+的 `server:` 下加入：
+
+```yaml
+  frame_ancestors:
+    - "'self'"
+    - "*"
+```
+
+然后重启应用。生产环境建议把 `*` 收窄为实际飞牛面板来源，例如：
+
+```yaml
+  frame_ancestors:
+    - "'self'"
+    - "http://nas.example.com:5666"
+    - "https://nas.example.com"
+```
+
 ## 自动构建
 
 工作流：[`.github/workflows/build-fpk.yml`](.github/workflows/build-fpk.yml)
@@ -80,21 +129,21 @@ fileadmin_all_v1.0.2.fpk
 
 在 GitHub Actions 中运行 **Build fnOS FPK**，填写：
 
-- `fileadmin_version`：`1.0.2`
+- `fileadmin_version`：`1.0.3`
 - `fileadmin_ref`：`main`，或 FileAdmin 的 tag/commit
 
 生成：
 
 ```text
-fileadmin_all_v1.0.2.fpk
-fileadmin_all_v1.0.2.fpk.sha256
+fileadmin_all_v1.0.3.fpk
+fileadmin_all_v1.0.3.fpk.sha256
 ```
 
 ### 打 tag 触发
 
 ```bash
-git tag v1.0.2
-git push origin v1.0.2
+git tag v1.0.3
+git push origin v1.0.3
 ```
 
 工作流会构建 `.fpk` 并创建 GitHub Release。
@@ -134,7 +183,7 @@ export FILEADMIN_SRC=/path/to/fileAdmin
 1. 读取 `package/manifest` 中的版本号
 2. 交叉编译 `linux/amd64` 和 `linux/arm64`
 3. 下载对应平台的 fnpack
-4. 生成 `fileadmin_all_v1.0.2.fpk`
+4. 生成 `fileadmin_all_v1.0.3.fpk`
 5. 生成 `.sha256`
 
 ## 手动打包（可选）
@@ -144,12 +193,12 @@ export FILEADMIN_SRC=/path/to/fileAdmin
 ```bash
 # 在 FileAdmin 源码目录
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-  go build -trimpath -ldflags "-s -w -X main.version=v1.0.2" \
+  go build -trimpath -ldflags "-s -w -X main.version=v1.0.3" \
   -o /path/to/fnos-fileadmin/package/app/server/fileadmin_x86_64 \
   ./cmd/fileadmin
 
 CGO_ENABLED=0 GOOS=linux GOARCH=arm64 \
-  go build -trimpath -ldflags "-s -w -X main.version=v1.0.2" \
+  go build -trimpath -ldflags "-s -w -X main.version=v1.0.3" \
   -o /path/to/fnos-fileadmin/package/app/server/fileadmin_aarch64 \
   ./cmd/fileadmin
 ```
@@ -171,7 +220,7 @@ chmod +x fnpack
 生成：
 
 ```text
-fileadmin_all_v1.0.2.fpk
+fileadmin_all_v1.0.3.fpk
 ```
 
 ## 目录结构
@@ -221,7 +270,7 @@ fileadmin_all_v1.0.2.fpk
 | `platform=x86/arm/all` | `platform=all`，实际包含 x86_64 与 aarch64 二进制 |
 | 文件读写路径安全 | FileAdmin 服务端规范化路径、拒绝目录穿越、软链逃逸防护 |
 | 付费声明 | 本应用免费，无付费功能 |
-| 版本号三段式 | manifest 中为 `1.0.2`，工作流强制校验 `x.y.z` 或 `x.y.z-m` |
+| 版本号三段式 | manifest 中为 `1.0.3`，工作流强制校验 `x.y.z` 或 `x.y.z-m` |
 | 应用名称不得以飞牛开头 | 名称为 `FileAdmin`，appname 为 `fileadmin` |
 
 ## 说明与边界

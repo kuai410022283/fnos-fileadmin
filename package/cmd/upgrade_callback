@@ -2,6 +2,19 @@
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+APP_ROOT="$(dirname "$SCRIPT_DIR")"
+TRIM_PKGVAR="${TRIM_PKGVAR:-${APP_ROOT}/var}"
+CONFIG="${TRIM_PKGVAR}/config.yaml"
+
+# Older 1.0.x packages did not have this setting. Keep the existing config on
+# upgrade, but add the frame policy needed by the fnOS desktop iframe.
+if [ -f "${CONFIG}" ] && ! grep -q '^[[:space:]]*frame_ancestors:' "${CONFIG}"; then
+  awk -v line="  frame_ancestors: [\"'self'\", \"*\"]" '
+    /^server:/ && !done { print; print line; done=1; next }
+    { print }
+  ' "${CONFIG}" >"${CONFIG}.new" && mv "${CONFIG}.new" "${CONFIG}" || true
+fi
+
 if [ -x "${SCRIPT_DIR}/main" ]; then
   "${SCRIPT_DIR}/main" start
 fi

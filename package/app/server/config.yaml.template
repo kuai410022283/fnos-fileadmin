@@ -4,6 +4,12 @@ server:
   read_header_timeout: 10s
   idle_timeout: 120s
   shutdown_timeout: 15s
+  # fnOS opens the app in an iframe. Keep this permissive for direct-port
+  # installations; replace "*" with the exact fnOS panel origin for stricter
+  # clickjacking protection.
+  frame_ancestors:
+    - "'self'"
+    - "*"
 
 database:
   dsn: "__DB_PATH__"
