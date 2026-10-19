@@ -10,6 +10,8 @@
 - FileAdmin 二进制已内嵌 Web 前端，不依赖 Node、Nginx 或独立数据库
 - 以专用 `package` 用户运行，不使用 root
 - 保留 FileAdmin 自身的登录、用户、ACL、分享和配额体系
+- 目录存在 `README.md` 时自动在文件列表下方渲染
+- 登录页不提示管理员用户名，翻页使用图标按钮
 - 安装向导设置服务端口和管理员初始密码
 - 数据、数据库、密钥、上传临时文件和回收站统一放在应用数据目录
 - 卸载时可选保留或删除应用数据，外部存储根不会被删除
@@ -20,7 +22,7 @@
 |---|---|
 | appname | `fileadmin` |
 | 显示名称 | FileAdmin |
-| 版本 | `1.0.4`（`x.y.z` 三段式） |
+| 版本 | `1.0.5`（`x.y.z` 三段式） |
 | 架构 | `all`：`x86_64` + `aarch64` |
 | 服务端口 | 安装时配置，默认 `18080` |
 | 入口 | `http://NAS-IP:端口/login` |
@@ -33,7 +35,7 @@
 从 [Releases](https://github.com/kuai410022283/fnos-fileadmin/releases) 下载最新：
 
 ```text
-fileadmin_all_v1.0.4.fpk
+fileadmin_all_v1.0.5.fpk
 ```
 
 在飞牛 NAS：
@@ -129,21 +131,21 @@ Framing ... violates the following Content Security Policy directive:
 
 在 GitHub Actions 中运行 **Build fnOS FPK**，填写：
 
-- `fileadmin_version`：`1.0.4`
+- `fileadmin_version`：`1.0.5`
 - `fileadmin_ref`：`main`，或 FileAdmin 的 tag/commit
 
 生成：
 
 ```text
-fileadmin_all_v1.0.4.fpk
-fileadmin_all_v1.0.4.fpk.sha256
+fileadmin_all_v1.0.5.fpk
+fileadmin_all_v1.0.5.fpk.sha256
 ```
 
 ### 打 tag 触发
 
 ```bash
-git tag v1.0.4
-git push origin v1.0.4
+git tag v1.0.5
+git push origin v1.0.5
 ```
 
 工作流会构建 `.fpk` 并创建 GitHub Release。
@@ -183,7 +185,7 @@ export FILEADMIN_SRC=/path/to/fileAdmin
 1. 读取 `package/manifest` 中的版本号
 2. 交叉编译 `linux/amd64` 和 `linux/arm64`
 3. 下载对应平台的 fnpack
-4. 生成 `fileadmin_all_v1.0.4.fpk`
+4. 生成 `fileadmin_all_v1.0.5.fpk`
 5. 生成 `.sha256`
 
 ## 手动打包（可选）
@@ -193,12 +195,12 @@ export FILEADMIN_SRC=/path/to/fileAdmin
 ```bash
 # 在 FileAdmin 源码目录
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-  go build -trimpath -ldflags "-s -w -X main.version=v1.0.4" \
+  go build -trimpath -ldflags "-s -w -X main.version=v1.0.5" \
   -o /path/to/fnos-fileadmin/package/app/server/fileadmin_x86_64 \
   ./cmd/fileadmin
 
 CGO_ENABLED=0 GOOS=linux GOARCH=arm64 \
-  go build -trimpath -ldflags "-s -w -X main.version=v1.0.4" \
+  go build -trimpath -ldflags "-s -w -X main.version=v1.0.5" \
   -o /path/to/fnos-fileadmin/package/app/server/fileadmin_aarch64 \
   ./cmd/fileadmin
 ```
@@ -220,7 +222,7 @@ chmod +x fnpack
 生成：
 
 ```text
-fileadmin_all_v1.0.4.fpk
+fileadmin_all_v1.0.5.fpk
 ```
 
 ## 目录结构
@@ -270,7 +272,7 @@ fileadmin_all_v1.0.4.fpk
 | `platform=x86/arm/all` | `platform=all`，实际包含 x86_64 与 aarch64 二进制 |
 | 文件读写路径安全 | FileAdmin 服务端规范化路径、拒绝目录穿越、软链逃逸防护 |
 | 付费声明 | 本应用免费，无付费功能 |
-| 版本号三段式 | manifest 中为 `1.0.4`，工作流强制校验 `x.y.z` 或 `x.y.z-m` |
+| 版本号三段式 | manifest 中为 `1.0.5`，工作流强制校验 `x.y.z` 或 `x.y.z-m` |
 | 应用名称不得以飞牛开头 | 名称为 `FileAdmin`，appname 为 `fileadmin` |
 
 ## 说明与边界
