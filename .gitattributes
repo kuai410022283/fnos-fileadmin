@@ -1,5 +1,6 @@
 * text=auto
 *.sh text eol=lf
+*.bat text eol=crlf
 package/cmd/* text eol=lf
 package/manifest text eol=lf
 package/config/* text eol=lf

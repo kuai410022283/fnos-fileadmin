@@ -91,7 +91,35 @@ git push origin v1.0.1
 6. 生成 `fileadmin_all_v<version>.fpk`
 7. 上传构建产物；tag 构建额外创建 Release
 
-## 本地打包
+## 一键本地打包
+
+本地需要 Go 1.26.9+ 与网络访问（用于自动下载 fnpack）。
+
+### Windows
+
+把 FileAdmin 源码放在本仓库同级 `..\fileAdmin`，或设置源码目录：
+
+```bat
+set FILEADMIN_SRC=D:\path\to\fileAdmin
+build-local.bat
+```
+
+### Linux / macOS
+
+```bash
+export FILEADMIN_SRC=/path/to/fileAdmin
+./build-local.sh
+```
+
+脚本会自动：
+
+1. 读取 `package/manifest` 中的版本号
+2. 交叉编译 `linux/amd64` 和 `linux/arm64`
+3. 下载对应平台的 fnpack
+4. 生成 `fileadmin_all_v1.0.1.fpk`
+5. 生成 `.sha256`
+
+## 手动打包（可选）
 
 准备两个 Linux 二进制：
 
@@ -134,6 +162,8 @@ fileadmin_all_v1.0.1.fpk
 .
 ├── .github/workflows/build-fpk.yml
 ├── build.sh
+├── build-local.sh
+├── build-local.bat
 ├── package
 │   ├── manifest
 │   ├── ICON.PNG
