@@ -7,10 +7,10 @@ title="FileAdmin"
 
 [install]
 stepTitle="FileAdmin 管理员"
-helpText="安装后通过 http://NAS地址:18080/login 登录。管理员用户名为 admin，请设置一个至少 8 位的密码。首次登录后请在「存储根」中添加需要管理的目录。"
+helpText="安装后通过 http://NAS地址:18080/login 登录。管理员用户名为 admin，请设置一个至少 10 位的密码。首次登录后请在「存储根」中添加需要管理的目录。"
 passwordLabel="管理员密码"
 passwordRequiredMsg="管理员密码不能为空"
-passwordLengthMsg="密码长度必须在 8-128 位之间"
+passwordLengthMsg="密码长度必须在 10-128 位之间"
 
 [uninstall]
 stepTitle="卸载 FileAdmin"

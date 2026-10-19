@@ -27,8 +27,8 @@ fi
 if [ -z "${PASSWORD}" ]; then
   fail "请设置 FileAdmin 管理员密码"
 fi
-if [ "${#PASSWORD}" -lt 8 ] || [ "${#PASSWORD}" -gt 128 ]; then
-  fail "管理员密码长度必须在 8-128 位之间"
+if [ "${#PASSWORD}" -lt 10 ] || [ "${#PASSWORD}" -gt 128 ]; then
+  fail "管理员密码长度必须在 10-128 位之间"
 fi
 
 umask 077

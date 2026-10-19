@@ -7,10 +7,10 @@ title="FileAdmin"
 
 [install]
 stepTitle="FileAdmin administrator"
-helpText="After installation, sign in at http://NAS-IP:18080/login. The administrator username is admin. Set a password of at least 8 characters, then add the directories you want to manage under Storage Roots."
+helpText="After installation, sign in at http://NAS-IP:18080/login. The administrator username is admin. Set a password of at least 10 characters, then add the directories you want to manage under Storage Roots."
 passwordLabel="Administrator password"
 passwordRequiredMsg="Administrator password is required"
-passwordLengthMsg="Password must be between 8 and 128 characters"
+passwordLengthMsg="Password must be between 10 and 128 characters"
 
 [uninstall]
 stepTitle="Uninstall FileAdmin"

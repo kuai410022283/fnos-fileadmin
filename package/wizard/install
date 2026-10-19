@@ -17,7 +17,7 @@
             "message": "${install.passwordRequiredMsg}"
           },
           {
-            "min": 8,
+            "min": 10,
             "max": 128,
             "message": "${install.passwordLengthMsg}"
           }
