@@ -1,5 +1,5 @@
 appname               = fileadmin
-version               = 1.0.24
+version               = 1.0.25
 display_name          = "${common.displayName}"
 desc                  = "${common.desc}"
 platform              = all
