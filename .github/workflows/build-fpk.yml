@@ -6,7 +6,7 @@ on:
       fileadmin_version:
         description: "FileAdmin version, three segments (for example 1.0.2)"
         required: true
-        default: "1.0.34"
+        default: "1.0.35"
         type: string
       fileadmin_ref:
         description: "FileAdmin git ref to build (tag, branch or commit)"
